@@ -6,21 +6,31 @@ import (
 	"strings"
 )
 
+// LineParser is a Parser optimised for formats that list each track on its own
+// line.
 type LineParser struct {
-	AllowNonSequential bool
+	AllowNonSequential bool // When set to true, tracks don't have to be on subsequent lines.
 
 	parseLine  func(line []byte) (Track, bool)
 	ignoreLine func(line []byte) bool
 	split      bufio.SplitFunc
 }
 
+// IgnoreLine sets the ignore line function. This function is called for each
+// line and if it returns true, the line is skipped.
+// By default it is nil which only ignores empty lines.
 func (lp *LineParser) IgnoreLine(ignoreLine func(line []byte) bool) {
 	lp.ignoreLine = ignoreLine
 }
+
+// Split sets the function that is used to split the text into lines.
 func (lp *LineParser) Split(split bufio.SplitFunc) {
 	lp.split = split
 }
 
+// Parse implements the Parser interface for LineParser.
+// It takes each line in the given text and if it isn't ignored, passes it to
+// the underlying parseLine function.
 func (lp *LineParser) Parse(text string) (List, error) {
 	if lp.parseLine == nil {
 		panic("line parser with nil ParseLine func")
@@ -92,6 +102,8 @@ func (lp *LineParser) Parse(text string) (List, error) {
 	return tl, nil
 }
 
+// NewLineParser creates a new line parser which uses parseLine to parse
+// each unignored line.
 func NewLineParser(parseLine func(line []byte) (Track, bool)) *LineParser {
 	if parseLine == nil {
 		panic("passed nil parseLine func")

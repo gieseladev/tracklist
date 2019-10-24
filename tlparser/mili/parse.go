@@ -1,3 +1,8 @@
+/*
+Package mili provides a tracklist parser.
+
+Format: <track number> - <track name> <start timestamp>
+*/
 package mili
 
 import (
@@ -7,7 +12,7 @@ import (
 	"regexp"
 )
 
-var lineMatcher = regexp.MustCompile(fmt.Sprintf(`^(\d+)\s*\p{Pd}\s*(.+?)\s*(%s)$`, common.TimestampMatcher.String()))
+var lineMatcher = regexp.MustCompile(fmt.Sprintf(`^(\d+)\s*\p{Pd}\s*(.+?)\s*(%s)\s*$`, common.TimestampMatcher.String()))
 
 var Parser = common.NewLineParser(func(line []byte) (common.Track, bool) {
 	match := lineMatcher.FindSubmatch(line)

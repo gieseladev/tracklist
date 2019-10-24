@@ -10,7 +10,9 @@ type Track = common.Track
 type List = common.List
 
 var (
-	ErrNoParser = errors.New("no parser could parse the format")
+	ErrNoParser      = errors.New("no parser could parse the format")
+	ErrNoTracklist   = common.ErrNoTracklist
+	ErrInvalidFormat = common.ErrInvalidFormat
 )
 
 func Parse(text string) (List, error) {
@@ -21,10 +23,10 @@ func Parse(text string) (List, error) {
 	for _, parser := range parsers {
 		tl, err := parser.Parse(text)
 		switch err {
-		case common.ErrNoTracklist:
+		case ErrNoTracklist:
 			noTracklistCount++
 			continue
-		case common.ErrInvalidFormat:
+		case ErrInvalidFormat:
 			formatInvalid = true
 			continue
 		case nil:
@@ -36,11 +38,11 @@ func Parse(text string) (List, error) {
 	}
 
 	if formatInvalid {
-		return List{}, common.ErrInvalidFormat
+		return List{}, ErrInvalidFormat
 	}
 
 	if noTracklistCount == len(parsers) {
-		return List{}, common.ErrNoTracklist
+		return List{}, ErrNoTracklist
 	}
 
 	return List{}, ErrNoParser

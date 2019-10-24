@@ -1,3 +1,6 @@
+/*
+Package timestamp provides parsers for variable-length timestamps.
+*/
 package timestamp
 
 import (
@@ -6,6 +9,7 @@ import (
 	"strconv"
 )
 
+// secs, mins, hours, days
 var toSecs = [4]uint32{1, 60, 60 * 60, 24 * 60 * 60}
 
 // ParseTimestamp parses a timestamp in the form of hh:mm:ss where all parts are

@@ -1,3 +1,8 @@
+/*
+Package celeste provides a tracklist parser.
+
+Format: <index> [<start timestamp>] <track name>
+*/
 package celeste
 
 import (

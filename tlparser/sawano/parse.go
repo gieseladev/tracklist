@@ -1,3 +1,8 @@
+/*
+Package sawano provides a tracklist parser.
+
+Format: <start timestamp> - <end timestamp> <track name>
+*/
 package sawano
 
 import (

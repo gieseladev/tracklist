@@ -1,3 +1,8 @@
+/*
+Package inception provides a tracklist parser.
+
+Format: <start timestamp> <track name>
+*/
 package inception
 
 import (
