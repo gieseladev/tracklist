@@ -30,13 +30,12 @@ func (p nierParser) Parse(text string) (common.List, error) {
 		if err != nil || trackNumber != prevTrackNumber+1 {
 			return common.Track{}, false
 		}
+		prevTrackNumber = trackNumber
 
 		sec, err := timestamp.ParseTimestamp(match[3])
 		if err != nil {
 			return common.Track{}, false
 		}
-
-		prevTrackNumber = trackNumber
 
 		return common.Track{
 			StartOffsetMS: 1000 * sec,
