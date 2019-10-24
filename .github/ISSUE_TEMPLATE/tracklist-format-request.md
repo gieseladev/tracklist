@@ -1,7 +1,7 @@
 ---
 name: Tracklist Format Request
-about: Suggest a new tracklist format for this project
-title: ''
+about: Suggest a new tracklist format.
+title: New Tracklist Format
 labels: tracklist format
 assignees: ''
 
@@ -15,4 +15,4 @@ A simplified version of the format.
 Ex: `<number> <track name> <start time>`
 
 **Additional context**
-Add any other context or screenshots about the format request here.
+Add any other context to the format request here.
