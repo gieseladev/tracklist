@@ -1,18 +1,17 @@
-package tlparser
+package tracklist
 
 import (
-	"github.com/gieseladev/tracklist/tlparser/celeste"
-	"github.com/gieseladev/tracklist/tlparser/common"
-	"github.com/gieseladev/tracklist/tlparser/inception"
-	"github.com/gieseladev/tracklist/tlparser/mili"
-	"github.com/gieseladev/tracklist/tlparser/nier"
-	"github.com/gieseladev/tracklist/tlparser/sawano"
+	"github.com/gieseladev/tracklist/formats/celeste"
+	"github.com/gieseladev/tracklist/formats/inception"
+	"github.com/gieseladev/tracklist/formats/mili"
+	"github.com/gieseladev/tracklist/formats/nier"
+	"github.com/gieseladev/tracklist/formats/sawano"
 )
 
 // Parser is an interface for tracklist parsers.
 type Parser interface {
 	// Parse takes
-	Parse(text string) (common.List, error)
+	Parse(text string) (List, error)
 }
 
 var registeredParsers = []Parser{

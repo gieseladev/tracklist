@@ -1,9 +1,11 @@
+/*
+Package tracklist pares various tracklist formats.
+*/
 package tracklist
 
 import (
 	"errors"
-	"github.com/gieseladev/tracklist/tlparser"
-	"github.com/gieseladev/tracklist/tlparser/common"
+	"github.com/gieseladev/tracklist/common"
 )
 
 type Track = common.Track
@@ -19,7 +21,7 @@ func Parse(text string) (List, error) {
 	formatInvalid := false
 	noTracklistCount := 0
 
-	parsers := tlparser.All()
+	parsers := All()
 	for _, parser := range parsers {
 		tl, err := parser.Parse(text)
 		switch err {

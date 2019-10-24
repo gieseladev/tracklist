@@ -7,8 +7,8 @@ package inception
 
 import (
 	"fmt"
+	"github.com/gieseladev/tracklist/common"
 	"github.com/gieseladev/tracklist/timestamp"
-	"github.com/gieseladev/tracklist/tlparser/common"
 	"regexp"
 )
 

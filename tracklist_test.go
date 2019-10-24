@@ -3,8 +3,8 @@ package tracklist
 import (
 	"encoding/csv"
 	"errors"
+	"github.com/gieseladev/tracklist/common"
 	"github.com/gieseladev/tracklist/timestamp"
-	"github.com/gieseladev/tracklist/tlparser/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"

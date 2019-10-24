@@ -1,26 +1,26 @@
 /*
-Package mili provides a tracklist parser.
+Package nier provides a tracklist parser.
 
-Format: <track number> - <track name> <start timestamp>
+Format: <track number>. <track name> <start timestamp>
 */
-package mili
+package nier
 
 import (
 	"fmt"
+	"github.com/gieseladev/tracklist/common"
 	"github.com/gieseladev/tracklist/timestamp"
-	"github.com/gieseladev/tracklist/tlparser/common"
 	"regexp"
 	"strconv"
 )
 
-var lineMatcher = regexp.MustCompile(fmt.Sprintf(`^(\d+)\s*\p{Pd}\s*(.+?)\s*(%s)\s*$`, common.TimestampMatcher.String()))
+var lineMatcher = regexp.MustCompile(fmt.Sprintf(`^(\d+)[.:]\s*(.+?)\s*(%s)\s*$`, common.TimestampMatcher.String()))
 
-type miliParser struct{}
+type nierParser struct{}
 
-func (p miliParser) Parse(text string) (common.List, error) {
+func (p nierParser) Parse(text string) (common.List, error) {
 	prevTrackNumber := 0
 
-	return common.NewLineParser(func(line []byte) (common.Track, bool) {
+	lineParser := common.NewLineParser(func(line []byte) (common.Track, bool) {
 		match := lineMatcher.FindSubmatch(line)
 		if match == nil {
 			return common.Track{}, false
@@ -41,7 +41,9 @@ func (p miliParser) Parse(text string) (common.List, error) {
 			StartOffsetMS: 1000 * sec,
 			Name:          string(match[2]),
 		}, true
-	}).Parse(text)
+	})
+
+	return lineParser.Parse(text)
 }
 
-var Parser = miliParser{}
+var Parser = nierParser{}
