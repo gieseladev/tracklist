@@ -3,15 +3,14 @@ package tracklist
 import (
 	"encoding/csv"
 	"errors"
-	"fmt"
+	"github.com/gieseladev/tracklist/timestamp"
+	"github.com/gieseladev/tracklist/tlparser/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 )
@@ -19,61 +18,66 @@ import (
 type TestCase struct {
 	Name     string
 	Text     string
-	Expected Tracklist
+	Expected List
 }
 
 func (c TestCase) Run(t *testing.T) {
-	assert.Equal(t, c.Text, c.Expected)
+	actual, err := Parse(c.Text)
+	require.NoError(t, err)
+
+	assert.EqualValues(t, c.Expected, actual)
 }
 
-func parseTimestamp(ts string) (uint32, error) {
-	var s uint32
-	fields := strings.Split(ts, ":")
-
-	mult := uint32(1000)
-	for i := len(fields) - 1; i >= 0; i-- {
-		n, err := strconv.Atoi(fields[i])
-		if err != nil {
-			return s, err
-		}
-
-		s += uint32(n) * mult
-		mult *= 60
-	}
-
-	return s, nil
-}
-
-func loadTracklist(r io.Reader) (Tracklist, error) {
+func loadTracklist(r io.Reader) (List, error) {
 	reader := csv.NewReader(r)
 	reader.ReuseRecord = true
 
-	tracklist := Tracklist{}
+	tl := List{}
 
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return tracklist, err
+			return tl, err
 		}
 
-		if len(record) != 2 {
-			return tracklist, errors.New("unexpected fields count")
+		hasEndOffset := len(record) == 3
+
+		if !hasEndOffset && len(record) != 2 {
+			return tl, errors.New("unexpected field count")
 		}
 
-		offset, err := parseTimestamp(strings.TrimSpace(record[0]))
+		startOffset, err := timestamp.ParseTimestamp([]byte(strings.TrimSpace(record[0])))
 		if err != nil {
-			return tracklist, err
+			return tl, err
 		}
 
-		tracklist.Tracks = append(tracklist.Tracks, Track{
-			StartOffsetMS: offset,
-			Name:          record[1],
-		})
+		nameFieldIndex := 1
+		if hasEndOffset {
+			nameFieldIndex = 2
+		}
+
+		track := common.Track{
+			StartOffsetMS: 1000 * startOffset,
+			Name:          record[nameFieldIndex],
+		}
+
+		if hasEndOffset {
+			endOffset, err := timestamp.ParseTimestamp([]byte(strings.TrimSpace(record[1])))
+			if err != nil {
+				return tl, err
+			}
+
+			track.EndOffsetMS = 1000 * endOffset
+		} else if len(tl.Tracks) > 0 {
+			tl.Tracks[len(tl.Tracks)-1].EndOffsetMS = track.StartOffsetMS
+		}
+
+		tl.Tracks = append(tl.Tracks, track)
 	}
 
-	return tracklist, nil
+	return tl, nil
 }
 
 func LoadTestCase(textPath, tracklistPath string) (TestCase, error) {
@@ -89,7 +93,7 @@ func LoadTestCase(textPath, tracklistPath string) (TestCase, error) {
 	}
 
 	testCase := TestCase{
-		Name: strings.TrimSuffix(path.Base(textPath), path.Ext(textPath)),
+		Name: strings.TrimSuffix(filepath.Base(textPath), filepath.Ext(textPath)),
 		Text: string(data),
 	}
 
@@ -123,8 +127,6 @@ func LoadTestCases(dirname string) ([]TestCase, error) {
 	for i := 1; i < len(files); i += 2 {
 		tracklistPath := filepath.Join(dirname, files[i-1].Name())
 		textPath := filepath.Join(dirname, files[i].Name())
-
-		fmt.Println(textPath, tracklistPath)
 
 		testCase, err := LoadTestCase(textPath, tracklistPath)
 		if err != nil {
